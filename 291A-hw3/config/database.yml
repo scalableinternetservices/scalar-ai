@@ -57,8 +57,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: help_desk_backend_production
-    username: help_desk_backend
+    database: <%= ENV['RDS_DB_NAME'] %>
+    host: <%= ENV['RDS_HOSTNAME'] %>
+    password: <%= ENV['RDS_PASSWORD'] %>
+    port: <%= ENV['RDS_PORT'] %>
+    username: <%= ENV['RDS_USERNAME'] %>
     password: <%= ENV["HELP_DESK_BACKEND_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
