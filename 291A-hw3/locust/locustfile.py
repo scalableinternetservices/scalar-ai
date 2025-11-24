@@ -319,11 +319,12 @@ class IdleUser(HttpUser, ChatBackend):
     def on_start(self):
         """Called when a simulated user starts."""
         self.last_check_time = None
-        username = user_name_generator.generate_username()
-        password = username
-        self.user = self.login(username, password) or self.register(username, password)
+        self.user = user_store.get_random_user()
         if not self.user:
-            raise Exception(f"Failed to login or register user {username}")
+            # Fallback: register a new user if store is empty
+            username = user_name_generator.generate_username()
+            password = username
+            self.user = self.register(username, password)
 
     @task
     def poll_for_updates(self):
@@ -352,11 +353,12 @@ class ActiveUser(HttpUser, ChatBackend):
     def on_start(self):
         """Login or register the user."""
         self.last_check_time = None
-        username = user_name_generator.generate_username()
-        password = username
-        self.user = self.login(username, password) or self.register(username, password)
+        self.user = user_store.get_random_user()
         if not self.user:
-            raise Exception(f"Failed to login or register user {username}")
+            # Fallback: register a new user if store is empty
+            username = user_name_generator.generate_username()
+            password = username
+            self.user = self.register(username, password)
 
     @task(3)
     def browse_conversations(self):
@@ -408,11 +410,12 @@ class ExpertUser(HttpUser, ChatBackend):
     def on_start(self):
         """Login or register the expert user."""
         self.last_check_time = None
-        username = user_name_generator.generate_username()
-        password = username
-        self.user = self.login(username, password) or self.register(username, password)
+        self.user = user_store.get_random_user()
         if not self.user:
-            raise Exception(f"Failed to login or register user {username}")
+            # Fallback: register a new user if store is empty
+            username = user_name_generator.generate_username()
+            password = username
+            self.user = self.register(username, password)
 
     @task(4)
     def respond_to_conversations(self):
