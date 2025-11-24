@@ -370,7 +370,7 @@ class ActiveUser(HttpUser, ChatBackend):
             self.get_conversation(self.user, conv.get("id"))
 
     @task(2)
-    def create_conversation(self):
+    def create_new_conversation(self):
         """Create a new conversation."""
         title = random.choice(CONVERSATION_TITLES)
         self.create_conversation(self.user, title)
