@@ -32,6 +32,9 @@ gem "image_processing", "~> 1.2"
 gem "rack-cors" # For handling Cross-Origin Resource Sharing (CORS) requests from the frontend
 gem "jwt" # For JSON Web Token authentication (if you choose JWT over sessions)
 gem "activerecord-session_store" # For database-backed session storage
+
+gem "aws-sdk-bedrockruntime" # AWS SDK for Bedrock Runtime
+
 group :test do
   gem "mocha"
 end
