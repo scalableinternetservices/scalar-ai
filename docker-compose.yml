@@ -19,9 +19,11 @@ services:
       - RAILS_ENV=development
       - DATABASE_URL=mysql2://root:password@db:3306
       - SECRET_KEY_BASE=development_secret_key_base_that_is_very_long_and_secure_for_development_only
+      - AWS_SHARED_CREDENTIALS_FILE=/app/.aws/cs291_credentials
     volumes:
       - ./help_desk_backend:/app
       - bundle_cache:/usr/local/bundle
+      - ${HOME}/.aws:/app/.aws:ro
     depends_on:
       - db
     stdin_open: true
