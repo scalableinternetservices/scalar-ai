@@ -11,6 +11,7 @@ class Conversation < ApplicationRecord
 
   # Callbacks
   before_validation :set_default_status, on: :create
+  after_create :trigger_auto_assignment
 
   def unread_count_for(user)
     messages.where.not(sender_id: user.id).where(is_read: false).count
@@ -20,5 +21,10 @@ class Conversation < ApplicationRecord
 
   def set_default_status
     self.status ||= "waiting"
+  end
+
+  def trigger_auto_assignment
+    # Trigger auto-assignment job asynchronously
+    AutoAssignConversationJob.perform_later(id)
   end
 end

@@ -5,10 +5,10 @@
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
 # Ignore bundler config.
-/.bundle
+*/.bundle/
 
 # Ignore all environment files.
-/.env*
+*/.env*
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -33,4 +33,5 @@
 */.DS_Store/*
 .DS_Store
 
-*/.cache
+*/.cache/
+*/.aws/

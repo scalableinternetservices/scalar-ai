@@ -10,6 +10,7 @@ export interface ExpertProfile {
 export interface ExpertQueue {
   waitingConversations: Conversation[]; // conversations waiting for some expert to claim them
   assignedConversations: Conversation[]; // conversations this expert has claimed and is actively working on
+  resolvedConversations: Conversation[]; // conversations this expert has resolved
 }
 
 /**
