@@ -27,7 +27,10 @@ class WebScraperService
     results.map { |entry| format_entry(entry) }.join("\n\n")
   end
 
-  def self.crawl(uri, current_depth:, max_depth:, visited:, results:, timeout:)
+  def self.crawl(uri, current_depth:, max_depth:, visited:, results:, timeout:, root_domain: nil)
+    # Set root_domain on first call
+    root_domain ||= "#{uri.host}#{uri.port && uri.port != 443 ? ":#{uri.port}" : ""}"
+    
     return if visited.include?(uri.to_s)
     visited << uri.to_s
 
@@ -41,8 +44,8 @@ class WebScraperService
 
     return if current_depth >= max_depth
 
-    extract_links(document, uri).each do |child_uri|
-      crawl(child_uri, current_depth: current_depth + 1, max_depth: max_depth, visited: visited, results: results, timeout: timeout)
+    extract_links(document, uri, root_domain).each do |child_uri|
+      crawl(child_uri, current_depth: current_depth + 1, max_depth: max_depth, visited: visited, results: results, timeout: timeout, root_domain: root_domain)
     end
   end
   private_class_method :crawl
@@ -90,7 +93,7 @@ class WebScraperService
   end
   private_class_method :clean_document
 
-  def self.extract_links(document, base_uri)
+  def self.extract_links(document, base_uri, root_domain)
     document.css("a[href]").filter_map do |node|
       href = node["href"]
       next unless href
@@ -102,6 +105,10 @@ class WebScraperService
       end
 
       next unless candidate.scheme == "https"
+
+      # Only follow links on the same domain (internal links)
+      candidate_domain = "#{candidate.host}#{candidate.port && candidate.port != 443 ? ":#{candidate.port}" : ""}"
+      next unless candidate_domain == root_domain
 
       candidate.fragment = nil
       candidate
