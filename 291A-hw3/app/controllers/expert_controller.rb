@@ -4,11 +4,11 @@ class ExpertController < ApplicationController
   before_action :set_conversation, only: [ :claim, :unclaim ]
 
   def queue
-    waiting_conversations = Rails.cache.fetch("expert_queue:waiting", expires_in: 5.seconds) do
+    waiting_json = Rails.cache.fetch("expert_queue:waiting_json", expires_in: 2.seconds) do
       Conversation.where(status: "waiting")
                  .includes(:initiator, :assigned_expert)
                  .order(created_at: :asc)
-                 .to_a
+                 .map { |c| conversation_json(c, c.initiator) }
     end
 
     # expert expects immediate feedback after claim / unclaim actions so we do not cache assigned conversations
@@ -17,7 +17,7 @@ class ExpertController < ApplicationController
                                         .order(updated_at: :desc)
 
     render json: {
-      waitingConversations: waiting_conversations.map { |c| conversation_json(c, current_user) },
+      waitingConversations: waiting_json,
       assignedConversations: assigned_conversations.map { |c| conversation_json(c, current_user) }
     }, status: :ok
   end
