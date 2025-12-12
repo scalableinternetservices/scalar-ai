@@ -62,6 +62,7 @@ class ApplicationController < ActionController::API
       id: profile.id.to_s,
       userId: profile.user_id.to_s,
       bio: profile.bio,
+      expertFaq: profile.expert_faq,
       knowledgeBaseLinks: profile.knowledge_base_links || [],
       createdAt: profile.created_at.iso8601,
       updatedAt: profile.updated_at.iso8601

@@ -133,6 +133,6 @@ class ExpertController < ApplicationController
   end
 
   def profile_params
-    params.permit(:bio, knowledge_base_links: [])
+    params.permit(:bio, :expert_faq, knowledge_base_links: [])
   end
 end
