@@ -23,8 +23,6 @@ export default function ExpertQueueManager({
 
   const assignedConversations = expertQueue?.assignedConversations || [];
 
-  const resolvedConversations = expertQueue?.resolvedConversations || [];
-
   const getConversationAge = (createdAt: string) => {
     const now = new Date();
     const created = new Date(createdAt);
@@ -203,71 +201,6 @@ export default function ExpertQueueManager({
                 <p>No active conversations</p>
                 <p className="text-sm">
                   Claim a conversation above to get started
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Resolved Conversations */}
-      <div id="resolved-conversations">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                Resolved Conversations ({resolvedConversations.length})
-              </CardTitle>
-              <Badge variant="outline" className="bg-green-50">
-                {resolvedConversations.length} completed
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {resolvedConversations.length > 0 ? (
-              <div className="space-y-3">
-                {resolvedConversations.map(conversation => (
-                  <div
-                    key={conversation.id}
-                    className="border border-green-200 rounded-lg p-4 space-y-3 bg-green-50/30"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">
-                          {conversation.title}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                            Resolved
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            Completed{' '}
-                            {new Date(
-                              conversation.updatedAt
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onViewConversation(conversation.id)}
-                      >
-                        View
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <CheckCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No resolved conversations yet</p>
-                <p className="text-sm">
-                  Resolved conversations will appear here
                 </p>
               </div>
             )}

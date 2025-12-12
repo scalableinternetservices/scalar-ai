@@ -112,17 +112,9 @@ export class ApiChatService implements ChatService {
     id: string,
     request: UpdateConversationRequest
   ): Promise<Conversation> {
-    // Implement updateConversation to resolve conversations
-    // Only supports status: 'resolved' for now
-    if (request.status === 'resolved') {
-      const RESOLVE_CONV_ENDPOINT: string = `/expert/conversations/${id}/resolve`;
-      const response = await this.makeRequest<Conversation>(RESOLVE_CONV_ENDPOINT, {
-        method: "POST",
-      });
-      return response;
-    }
-    
-    throw new Error('updateConversation only supports resolving conversations');
+    // SKIP, not currently used by application
+
+    throw new Error('updateConversation method not implemented');
   }
 
   async deleteConversation(id: string): Promise<void> {

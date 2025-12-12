@@ -1,7 +1,7 @@
 class ExpertController < ApplicationController
   before_action :authenticate_with_jwt!
   before_action :ensure_expert!
-  before_action :set_conversation, only: [ :claim, :unclaim, :resolve ]
+  before_action :set_conversation, only: [ :claim, :unclaim ]
 
   def queue
     waiting_conversations = Conversation.where(status: "waiting")
@@ -10,14 +10,9 @@ class ExpertController < ApplicationController
     assigned_conversations = Conversation.where(assigned_expert_id: current_user.id, status: "active")
                                         .order(updated_at: :desc)
 
-    resolved_conversations = Conversation.where(assigned_expert_id: current_user.id, status: "resolved")
-                                        .order(updated_at: :desc)
-                                        .limit(20) # Last 20 resolved conversations
-
     render json: {
       waitingConversations: waiting_conversations.map { |c| conversation_json(c, current_user) },
-      assignedConversations: assigned_conversations.map { |c| conversation_json(c, current_user) },
-      resolvedConversations: resolved_conversations.map { |c| conversation_json(c, current_user) }
+      assignedConversations: assigned_conversations.map { |c| conversation_json(c, current_user) }
     }, status: :ok
   end
 
@@ -54,24 +49,6 @@ class ExpertController < ApplicationController
     assignment&.update(status: "resolved", resolved_at: Time.current)
 
     render json: { success: true }, status: :ok
-  end
-
-  def resolve
-    unless @conversation.assigned_expert_id == current_user.id
-      render json: { error: "You are not assigned to this conversation" }, status: :forbidden
-      return
-    end
-
-    # Update conversation status to resolved
-    @conversation.update!(status: "resolved")
-
-    # Update expert assignment to resolved
-    assignment = @conversation.expert_assignments.find_by(expert_id: current_user.id, status: "active")
-    if assignment
-      assignment.update!(status: "resolved", resolved_at: Time.current)
-    end
-
-    render json: conversation_json(@conversation, current_user), status: :ok
   end
 
   def profile
@@ -156,6 +133,6 @@ class ExpertController < ApplicationController
   end
 
   def profile_params
-    params.permit(:bio, knowledge_base_links: [])
+    params.permit(:bio, :expert_faq, knowledge_base_links: [])
   end
 end

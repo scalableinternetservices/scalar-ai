@@ -37,7 +37,6 @@ Rails.application.routes.draw do
   get "/expert/queue", to: "expert#queue"
   post "/expert/conversations/:conversation_id/claim", to: "expert#claim"
   post "/expert/conversations/:conversation_id/unclaim", to: "expert#unclaim"
-  post "/expert/conversations/:conversation_id/resolve", to: "expert#resolve"
   get "/expert/profile", to: "expert#profile"
   put "/expert/profile", to: "expert#update_profile"
   get "/expert/assignments/history", to: "expert#assignment_history"

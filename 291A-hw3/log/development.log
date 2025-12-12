@@ -1,0 +1,16 @@
+  [1m[35m (0.0ms)[0m  [1m[34mSELECT GET_LOCK('1333825462379289285', 0) /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT `schema_migrations`.`version` FROM `schema_migrations` ORDER BY `schema_migrations`.`version` ASC /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM `ar_internal_metadata` WHERE `ar_internal_metadata`.`key` = 'environment' ORDER BY `ar_internal_metadata`.`key` ASC LIMIT 1 /*application='HelpDeskBackend'*/[0m
+Migrating to AddExpertFaqToExpertProfiles (20251110080001)
+  [1m[35m (62.3ms)[0m  [1m[35mALTER TABLE `expert_profiles` ADD `expert_faq` text /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (2.7ms)[0m  [1m[32mINSERT INTO `schema_migrations` (`version`) VALUES ('20251110080001') /*application='HelpDeskBackend'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT RELEASE_LOCK('1333825462379289285') /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT `schema_migrations`.`version` FROM `schema_migrations` ORDER BY `schema_migrations`.`version` ASC /*application='HelpDeskBackend'*/[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE DATABASE `help_desk_backend_development` DEFAULT CHARACTER SET `utf8mb4` /*application='HelpDeskBackend'*/[0m
+  [1m[35m (1.1ms)[0m  [1m[35mCREATE DATABASE `help_desk_backend_development` DEFAULT CHARACTER SET `utf8mb4` /*application='HelpDeskBackend'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT GET_LOCK('1333825462379289285', 0) /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT `schema_migrations`.`version` FROM `schema_migrations` ORDER BY `schema_migrations`.`version` ASC /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM `ar_internal_metadata` WHERE `ar_internal_metadata`.`key` = 'environment' ORDER BY `ar_internal_metadata`.`key` ASC LIMIT 1 /*application='HelpDeskBackend'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[34mSELECT RELEASE_LOCK('1333825462379289285') /*application='HelpDeskBackend'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT `schema_migrations`.`version` FROM `schema_migrations` ORDER BY `schema_migrations`.`version` ASC /*application='HelpDeskBackend'*/[0m
+  [1m[35m (1.3ms)[0m  [1m[35mCREATE DATABASE `help_desk_backend_development` DEFAULT CHARACTER SET `utf8mb4` /*application='HelpDeskBackend'*/[0m

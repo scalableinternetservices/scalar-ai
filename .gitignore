@@ -6,12 +6,13 @@
 
 # Ignore bundler config.
 */.bundle/
+*/.aws/
 
 # Ignore all environment files.
 */.env*
 
 # Ignore all logfiles and tempfiles.
-/log/*
+*/log/*
 */tmp
 !/log/.keep
 !/tmp/.keep
@@ -33,5 +34,4 @@
 */.DS_Store/*
 .DS_Store
 
-*/.cache/
-*/.aws/
+*/.cache
