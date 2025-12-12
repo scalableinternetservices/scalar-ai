@@ -14,8 +14,8 @@ class AssignExpertJob < ApplicationJob
     initial_message = conversation.messages.order(created_at: :asc).first
     return unless initial_message
 
-    # Get all expert profiles with bios
-    expert_profiles = ExpertProfile.includes(:user).where.not(bio: [ nil, "" ])
+    # Get all expert profiles with bios (cached)
+    expert_profiles = ExpertProfile.cached_experts_with_bios
     return if expert_profiles.empty?
 
     # Build expert information for the LLM
