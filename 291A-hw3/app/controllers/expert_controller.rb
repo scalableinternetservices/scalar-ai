@@ -4,10 +4,16 @@ class ExpertController < ApplicationController
   before_action :set_conversation, only: [ :claim, :unclaim ]
 
   def queue
-    waiting_conversations = Conversation.where(status: "waiting")
-                                       .order(created_at: :asc)
+    waiting_conversations = Rails.cache.fetch("expert_queue:waiting", expires_in: 5.seconds) do
+      Conversation.where(status: "waiting")
+                 .includes(:initiator, :assigned_expert)
+                 .order(created_at: :asc)
+                 .to_a
+    end
 
+    # expert expects immediate feedback after claim / unclaim actions so we do not cache assigned conversations
     assigned_conversations = Conversation.where(assigned_expert_id: current_user.id, status: "active")
+                                        .includes(:initiator, :assigned_expert)
                                         .order(updated_at: :desc)
 
     render json: {
@@ -133,6 +139,6 @@ class ExpertController < ApplicationController
   end
 
   def profile_params
-    params.permit(:bio, :expert_faq, knowledge_base_links: [])
+    params.permit(:bio, knowledge_base_links: [])
   end
 end
