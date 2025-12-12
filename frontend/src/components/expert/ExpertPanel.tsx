@@ -32,6 +32,8 @@ export default function ExpertPanel({
 
   const assignedConversations = expertQueue?.assignedConversations;
 
+  const resolvedConversations = expertQueue?.resolvedConversations;
+
   const handleSaveProfile = () => {
     const updatedProfile: Partial<ExpertProfile> = {
       bio: editedBio,
@@ -145,7 +147,7 @@ export default function ExpertPanel({
           <CardTitle>Queue Statistics</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
                 {waitingConversations?.length}
@@ -157,6 +159,12 @@ export default function ExpertPanel({
                 {assignedConversations?.length}
               </div>
               <div className="text-sm text-gray-600">Active</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-600">
+                {resolvedConversations?.length}
+              </div>
+              <div className="text-sm text-gray-600">Resolved</div>
             </div>
           </div>
         </CardContent>
@@ -194,6 +202,19 @@ export default function ExpertPanel({
               }}
             >
               View My Active Conversations ({assignedConversations?.length})
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                // Scroll to resolved conversations
+                const resolvedSection = document.getElementById(
+                  'resolved-conversations'
+                );
+                resolvedSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              View Resolved Conversations ({resolvedConversations?.length})
             </Button>
           </div>
         </CardContent>
