@@ -291,7 +291,8 @@ class UserStore:
     def __init__(self):
         self.used_usernames = {}
         self.username_lock = threading.Lock()
-        self.conversations = []
+        # Track conversations per user for proper access control
+        self.user_conversations = {}  # user_id -> [conversation_ids]
         self.conversations_lock = threading.Lock()
 
     def get_random_user(self):
@@ -308,17 +309,25 @@ class UserStore:
                 "auth_token": auth_token,
                 "user_id": user_id
             }
-            return self.used_usernames[username]
-
-    def add_conversation(self, conversation_id):
         with self.conversations_lock:
-            self.conversations.append(conversation_id)
+            if user_id not in self.user_conversations:
+                self.user_conversations[user_id] = []
+        return self.used_usernames[username]
 
-    def get_random_conversation(self):
+    def add_conversation(self, user_id, conversation_id):
+        """Add a conversation to a specific user's list."""
         with self.conversations_lock:
-            if not self.conversations:
+            if user_id not in self.user_conversations:
+                self.user_conversations[user_id] = []
+            if conversation_id not in self.user_conversations[user_id]:
+                self.user_conversations[user_id].append(conversation_id)
+
+    def get_random_conversation(self, user_id):
+        """Get a random conversation that this user has access to."""
+        with self.conversations_lock:
+            if user_id not in self.user_conversations or not self.user_conversations[user_id]:
                 return None
-            return random.choice(self.conversations)
+            return random.choice(self.user_conversations[user_id])
 
 
 user_store = UserStore()
@@ -408,7 +417,15 @@ class ChatBackend:
             name="/conversations"
         )
         if response.status_code == 200:
-            return response.json()
+            conversations = response.json()
+            # Sync backend conversations with local tracking
+            # Backend returns conversations where user is initiator OR assigned expert
+            user_id = user.get("user_id")
+            for conv in conversations:
+                conv_id = conv.get("id")
+                if conv_id:
+                    user_store.add_conversation(user_id, conv_id)
+            return conversations
         return []
 
     def get_conversation(self, user, conversation_id):
@@ -432,7 +449,8 @@ class ChatBackend:
             data = response.json()
             conversation_id = data.get("id")
             if conversation_id:
-                user_store.add_conversation(conversation_id)
+                # Add conversation to this user's list
+                user_store.add_conversation(user.get("user_id"), conversation_id)
             return data
         return None
 
@@ -465,7 +483,16 @@ class ChatBackend:
             name="/expert/queue"
         )
         if response.status_code == 200:
-            return response.json()
+            queue = response.json()
+            # Sync assigned conversations with local tracking
+            # This ensures conversations claimed by this expert are tracked
+            user_id = user.get("user_id")
+            assigned = queue.get("assignedConversations", [])
+            for conv in assigned:
+                conv_id = conv.get("id")
+                if conv_id:
+                    user_store.add_conversation(user_id, conv_id)
+            return queue
         return None
 
     def claim_conversation(self, user, conversation_id):
@@ -475,7 +502,11 @@ class ChatBackend:
             headers=auth_headers(user.get("auth_token")),
             name="/expert/conversations/[id]/claim"
         )
-        return response.status_code == 200
+        # If claim successful, add to this expert's conversation list
+        if response.status_code == 200:
+            user_store.add_conversation(user.get("user_id"), conversation_id)
+            return True
+        return False
 
     def get_expert_profile(self, user):
         """Get the expert profile."""
@@ -631,16 +662,16 @@ class ActiveUser(HttpUser, ChatBackend):
 
     @task(4)
     def post_message_to_conversation(self):
-        """Post a message to a randomly selected conversation."""
-        conversation_id = user_store.get_random_conversation()
+        """Post a message to a randomly selected conversation that this user owns."""
+        conversation_id = user_store.get_random_conversation(self.user.get("user_id"))
         if conversation_id:
             content = random.choice(SAMPLE_MESSAGES)
             self.post_message(self.user, conversation_id, content)
 
     @task(3)
     def read_messages(self):
-        """Read messages in a conversation."""
-        conversation_id = user_store.get_random_conversation()
+        """Read messages in a conversation that this user owns."""
+        conversation_id = user_store.get_random_conversation(self.user.get("user_id"))
         if conversation_id:
             self.get_messages(self.user, conversation_id)
 
@@ -672,8 +703,10 @@ class ExpertUser(HttpUser, ChatBackend):
             password = username
             self.user = self.register(username, password)
         
-        # 80% chance to set up expert profile with bio and knowledge base
-        if random.randint(1, 100) <= 80:
+        # A new user is created with 10% (new user) chance,
+        # A new expert profile is set up 20% (set up chance) * 20% (expert chance) = 4% of the time
+        # This means for every new user, there is a 40% chance they will be an expert with profile
+        if random.randint(1, 100) <= 20:
             self.setup_expert_profile()
 
     def setup_expert_profile(self):
